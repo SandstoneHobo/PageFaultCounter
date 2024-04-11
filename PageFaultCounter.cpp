@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 
+//help function to find the numbers in the ref string
 std::vector<char> numbersInRefString(std::string ref_string) {
     std::vector<char> num_list;
     for (int idx = 0; idx < ref_string.size(); idx++) {
@@ -61,7 +62,7 @@ char const* charConvert(int num) {
     return n_char;
 }
 
-int LRUCount(std::string ref_string, int num_frames) {
+void LRUCount(std::string ref_string, int num_frames) {
     std::vector<char> numbers = numbersInRefString(ref_string);
     std::vector<char> page_table;
     std::vector<std::string> frame_list;
@@ -101,6 +102,57 @@ int LRUCount(std::string ref_string, int num_frames) {
 
         }
         else {
+            int loc = vectorFind(used_order, numbers[idx]);
+            used_order.erase(used_order.begin() + loc);
+            used_order.push_back(numbers[idx]);
+
+            std::cout << "Step " << idx + 1 << " - Page table: ";
+            printVector(page_table, '{', '}');
+            std::cout << ", Frames: ";
+            printVector(frame_list, '[', ']');
+            std::cout << ", Faults: " << fault_count << std::endl;
+        }
+    }   
+}
+
+int OPTCount(std::string ref_string, int num_frames) {
+    std::vector<char> numbers = numbersInRefString(ref_string);
+    std::vector<char> page_table;
+    std::vector<std::string> frame_list;
+    int frame = 1;
+    int fault_count = 0;
+
+
+    return -1;
+}
+
+void FIFOCount(std::string ref_string, int num_frames) {
+    std::vector<char> numbers = numbersInRefString(ref_string);
+    std::vector<char> page_table;
+    std::vector<std::string> frame_list;
+    int frame = 1;
+    int fault_count = 0;
+
+    for (int idx = 0; idx < numbers.size(); idx++) {
+        if (!numInVector(page_table, numbers[idx])) {
+            fault_count++;
+
+            if (page_table.size() >= num_frames) {
+                page_table.erase(page_table.begin());
+                frame = stoi(frame_list[0]);
+                frame_list.erase(frame_list.begin());
+            }
+            page_table.push_back(numbers[idx]);
+            frame_list.push_back(std::to_string(frame));
+            frame++;
+
+            std::cout << "Step " << idx + 1 << " - Page table: ";
+            printVector(page_table, '{', '}');
+            std::cout << ", Frames: ";
+            printVector(frame_list, '[', ']');
+            std::cout << ", Faults: " << fault_count << std::endl;
+        }
+        else {
             std::cout << "Step " << idx + 1 << " - Page table: ";
             printVector(page_table, '{', '}');
             std::cout << ", Frames: ";
@@ -108,24 +160,13 @@ int LRUCount(std::string ref_string, int num_frames) {
             std::cout << ", Faults: " << fault_count << std::endl;
         }
     }
-    
-    return fault_count;
-    
-}
-
-int OPTCount(std::string ref_string, int num_frames) {
-    return -1;
-}
-
-int FIFOCount(std::string ref_string, int num_frames) {
-    return -1;
 }
 
 int main()
 {
-    std::string ref_string = "7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 3";
+    std::string ref_string = "1, 3, 0, 3, 5, 6, 3";
     
-    LRUCount(ref_string, 4);
+    FIFOCount(ref_string, 4);
 
     return 0;
 }
