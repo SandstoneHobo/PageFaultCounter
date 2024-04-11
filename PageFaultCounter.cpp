@@ -106,41 +106,76 @@ void LRUCount(std::string ref_string, int num_frames) {
             frame_list.push_back(std::to_string(frame));
             used_order.push_back(numbers[idx]);
             frame++;
-
-            //formats the output to the way the homework specified
-            std::cout << "Step " << idx + 1 << " - Page table: ";
-            printVector(page_table, '{', '}');
-            std::cout << ", Frames: ";
-            printVector(frame_list, '[', ']');
-            std::cout << ", Faults: " << fault_count << std::endl;
-
         }
         else {
             //updates the used order if there is a page hit
             int loc = vectorFind(used_order, numbers[idx]);
             used_order.erase(used_order.begin() + loc);
             used_order.push_back(numbers[idx]);
-
-            //formats the output to the way the homework specified
-            std::cout << "Step " << idx + 1 << " - Page table: ";
-            printVector(page_table, '{', '}');
-            std::cout << ", Frames: ";
-            printVector(frame_list, '[', ']');
-            std::cout << ", Faults: " << fault_count << std::endl;
         }
+        //formats the output to the way the homework specified
+        std::cout << "Step " << idx + 1 << " - Page table: ";
+        printVector(page_table, '{', '}');
+        std::cout << ", Frames: ";
+        printVector(frame_list, '[', ']');
+        std::cout << ", Faults: " << fault_count << std::endl;
     }   
 }
 
 //function for Optimal replacement algorithm
-int OPTCount(std::string ref_string, int num_frames) {
-    std::vector<char> numbers;
-    std::vector<char> page_table;
+void OPTCount(std::string ref_string, int num_frames) {
+    std::vector<std::string> numbers = numbersInRefString(ref_string);
+    std::vector<std::string> page_table;
     std::vector<std::string> frame_list;
     int frame = 1;
     int fault_count = 0;
 
+    for (int idx = 0; idx < numbers.size(); idx++) {
+        if (!numInVector(page_table, numbers[idx])) {
+            fault_count++;
+            if (page_table.size() >= num_frames && idx != numbers.size() - 1) {
+                std::string replace = page_table[0];
+                std::vector<int> counts = { 0, 0, 0, 0 };
+                for (int index = idx + 1; index < numbers.size(); index++) {
+                    if (numInVector(page_table, numbers[index])) {
+                        counts[vectorFind(page_table, numbers[index])]++;
+                    }
+                    int min = counts[0];
+                    for (int j = 0; j < counts.size(); j++) {
+                        if (counts[j] < min) {
+                            replace = page_table[j];
+                            min = counts[j];
+                        }
+                    }
+                }
+                
+                int page_idx = vectorFind(page_table, replace);
 
-    return -1;
+                frame = stoi(frame_list[page_idx]);
+
+                page_table.erase(page_table.begin() + page_idx);
+                frame_list.erase(frame_list.begin() + page_idx);
+
+                
+              
+            }
+            else if (page_table.size() >= num_frames){
+                page_table.erase(page_table.begin());
+                frame = stoi(frame_list[0]);
+                frame_list.erase(frame_list.begin());
+            }
+
+            page_table.push_back(numbers[idx]);
+            frame_list.push_back(std::to_string(frame));
+            frame++;    
+        }
+        //formats the output to the way the homework specified
+        std::cout << "Step " << idx + 1 << " - Page table: ";
+        printVector(page_table, '{', '}');
+        std::cout << ", Frames: ";
+        printVector(frame_list, '[', ']');
+        std::cout << ", Faults: " << fault_count << std::endl;
+    }
 }
 
 //function for First In First Out replacement algorithm
@@ -181,9 +216,9 @@ void FIFOCount(std::string ref_string, int num_frames) {
 
 int main()
 {
-    std::string ref_string = "1, 3, 0, 3, 55, 6, 3";
+    std::string ref_string = "7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 3";
     
-    FIFOCount(ref_string, 4);
+    OPTCount(ref_string, 4);
 
     return 0;
 }
