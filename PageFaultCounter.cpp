@@ -216,9 +216,21 @@ void FIFOCount(std::string ref_string, int num_frames) {
 
 int main()
 {
-    std::string ref_string = "7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2, 3";
+    std::string ref_string = "";
+    int num_frames = 0;
+
+    std::cout << "Enter the reference string: ";
+    std::getline(std::cin, ref_string);
+
+    std::cout << "Enter the number of frames: ";
+    std::cin >> num_frames;
+
+    if (std::cin.fail()) {
+        std::cout << "An invalid input was given for number of frames.";
+        return -1;
+    }
     
-    OPTCount(ref_string, 4);
+    OPTCount(ref_string, num_frames);
 
     return 0;
 }
