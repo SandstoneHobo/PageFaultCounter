@@ -132,14 +132,18 @@ void OPTCount(std::string ref_string, int num_frames) {
 
     for (int idx = 0; idx < numbers.size(); idx++) {
         if (!numInVector(page_table, numbers[idx])) {
+            //increments the fault count if the given number is not in the page table
             fault_count++;
+            //checks if the page table is full before starting the replacement algorithm
             if (page_table.size() >= num_frames && idx != numbers.size() - 1) {
                 std::string replace = page_table[0];
                 std::vector<int> counts = { 0, 0, 0, 0 };
+                //counts the frequency of each number in the table in the rest of the reference string
                 for (int index = idx + 1; index < numbers.size(); index++) {
                     if (numInVector(page_table, numbers[index])) {
                         counts[vectorFind(page_table, numbers[index])]++;
                     }
+                    //finds the minimum of the page counts
                     int min = counts[0];
                     for (int j = 0; j < counts.size(); j++) {
                         if (counts[j] < min) {
@@ -149,10 +153,13 @@ void OPTCount(std::string ref_string, int num_frames) {
                     }
                 }
                 
+                //finds the page we decided to replace
                 int page_idx = vectorFind(page_table, replace);
 
+                //gets the frame of the page we are replacing
                 frame = stoi(frame_list[page_idx]);
 
+                //erases the page and frame so that we can push the new ones to the page table and frame list
                 page_table.erase(page_table.begin() + page_idx);
                 frame_list.erase(frame_list.begin() + page_idx);
 
@@ -160,11 +167,12 @@ void OPTCount(std::string ref_string, int num_frames) {
               
             }
             else if (page_table.size() >= num_frames){
+                //erases the first element in table if it is the last element in the reference string
                 page_table.erase(page_table.begin());
                 frame = stoi(frame_list[0]);
                 frame_list.erase(frame_list.begin());
             }
-
+            //adds the new number and frame to the page table/ frame list
             page_table.push_back(numbers[idx]);
             frame_list.push_back(std::to_string(frame));
             frame++;    
@@ -214,23 +222,55 @@ void FIFOCount(std::string ref_string, int num_frames) {
     }
 }
 
+//helper function to make a string all uppercase
+std::string upCase(std::string str) {
+    std::string temp;
+
+    for (int i = 0; i < str.size(); i++) {
+        temp.push_back(toupper(str[i])); //uses the toupper function on each character in the original string
+    }
+    return temp;
+}
+
 int main()
 {
+    //variables for user choices
+    std::string alg;
     std::string ref_string = "";
     int num_frames = 0;
 
+    //asks the user for a reference string
     std::cout << "Enter the reference string: ";
     std::getline(std::cin, ref_string);
 
+    //asks the user for a number of frames
     std::cout << "Enter the number of frames: ";
     std::cin >> num_frames;
 
+    //error handling for number of frames
     if (std::cin.fail()) {
         std::cout << "An invalid input was given for number of frames.";
         return -1;
     }
-    
-    OPTCount(ref_string, num_frames);
+
+    //asks the user for an algorithm to use
+    std::cout << "Enter the algorithm you want to use(OPT for optimal, FIFO for first in first out, or LRU for least recently used): ";
+    std::cin >> alg;
+
+    //applies the appropriate algorithm or outputs an error if their response is not in range
+    if (upCase(alg) == "OPT") {
+        OPTCount(ref_string, num_frames);
+    }
+    else if (upCase(alg) == "FIFO") {
+        FIFOCount(ref_string, num_frames);
+    }
+    else if (upCase(alg) == "LRU") {
+        LRUCount(ref_string, num_frames);
+    }
+    else {
+        std::cout << "Invalid algorithm symbol given";
+        return -1;
+    }
 
     return 0;
 }
