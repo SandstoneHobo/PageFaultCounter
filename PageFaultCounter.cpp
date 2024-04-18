@@ -250,7 +250,6 @@ int main()
     //error handling for number of frames
     if (std::cin.fail()) {
         std::cout << "An invalid input was given for number of frames.";
-        return -1;
     }
 
     //asks the user for an algorithm to use
@@ -269,8 +268,5 @@ int main()
     }
     else {
         std::cout << "Invalid algorithm symbol given";
-        return -1;
     }
-
-    return 0;
 }
